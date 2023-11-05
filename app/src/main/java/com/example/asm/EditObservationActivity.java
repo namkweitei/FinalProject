@@ -10,13 +10,14 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
+
 public class EditObservationActivity extends AppCompatActivity {
     private ObservationModel selectedObservation;
     private DatabaseHelper databaseHelper;
-
-    private EditText editTextObservation;
-    private EditText editTextTime;
-    private EditText editTextComments;
+    private TextInputLayout tilName, tilTime, tilComment;
+    private TextInputEditText editTextName, editTextTime, editTextComment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,13 +27,16 @@ public class EditObservationActivity extends AppCompatActivity {
         databaseHelper = new DatabaseHelper(this);
         selectedObservation = (ObservationModel) getIntent().getSerializableExtra("observation");
 
-        editTextObservation = findViewById(R.id.editTextObservation);
+        editTextName = findViewById(R.id.editTextObservation);
         editTextTime = findViewById(R.id.editTextTime);
-        editTextComments = findViewById(R.id.editTextComments);
+        editTextComment = findViewById(R.id.editTextComments);
+        tilName = findViewById(R.id.tilName);
+        tilTime = findViewById(R.id.tilTime);
+        tilComment = findViewById(R.id.tilComments);
 
-        editTextObservation.setText(selectedObservation.getObservation());
+        editTextName.setText(selectedObservation.getObservation());
         editTextTime.setText(selectedObservation.getTime());
-        editTextComments.setText(selectedObservation.getComments());
+        editTextComment.setText(selectedObservation.getComments());
 
 
         Button buttonSave = findViewById(R.id.buttonEdit);
@@ -40,32 +44,66 @@ public class EditObservationActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 saveChanges();
-                Intent intent = new Intent(EditObservationActivity.this, HikeListActivity.class);
-                startActivity(intent);
+
             }
         });
     }
+    private boolean validateInput(String name, String location, String date) {
+        boolean isValid = true;
+        if (name.isEmpty()) {
+            tilName.setError("Name is required");
+            isValid = false;
+        } else {
+            tilName.setError(null);
+        }
 
+        if (location.isEmpty()) {
+            tilTime.setError("Time is required");
+            isValid = false;
+        } else {
+            tilTime.setError(null);
+        }
+
+        if (date.isEmpty()) {
+            tilComment.setError("Comments is required");
+            isValid = false;
+        } else {
+            tilComment.setError(null);
+        }
+        return isValid;
+    }
+    private void clearInputFields() {
+        editTextName.setText("");
+        editTextTime.setText("");
+        editTextComment.setText("");
+
+        tilName.setError(null);
+        tilTime.setError(null);
+        tilComment.setError(null);
+    }
     private void saveChanges() {
 
-        String newObservation = editTextObservation.getText().toString();
+        String newObservation = editTextName.getText().toString();
         String newTime = editTextTime.getText().toString();
-        String newComments = editTextComments.getText().toString();
+        String newComments = editTextComment.getText().toString();
+        if (validateInput(newObservation, newTime, newComments)) {
+            long result = databaseHelper.updateObservation(
+                    selectedObservation.getId(),
+                    newObservation,
+                    newTime,
+                    newComments
+            );
 
-        long result = databaseHelper.updateObservation(
-                selectedObservation.getId(),
-                newObservation,
-                newTime,
-                newComments
-        );
-
-        if (result > 0) {
-
-            Toast.makeText(this, "Changes saved", Toast.LENGTH_SHORT).show();
-            finish();
-        } else {
-            Log.e("EditObservationActivity", "Error saving changes");
-            Toast.makeText(this, "Error saving changes", Toast.LENGTH_SHORT).show();
+            if (result > 0) {
+                Toast.makeText(this, "Changes saved", Toast.LENGTH_SHORT).show();
+                clearInputFields();
+                finish();
+                Intent intent = new Intent(EditObservationActivity.this, ObservationListActivity.class);
+                intent.putExtra("hike_id", selectedObservation.getHikeId());
+                startActivity(intent);
+            } else {
+                Toast.makeText(this, "Error saving changes", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 }

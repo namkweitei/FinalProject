@@ -56,13 +56,13 @@ public class MainActivity extends AppCompatActivity {
                     if (result != -1) {
                         Toast.makeText(MainActivity.this, "Hike added successfully.", Toast.LENGTH_SHORT).show();
                         clearInputFields();
-                        // You can navigate to another screen here if needed.
+                        Intent intent = new Intent(MainActivity.this, HikeListActivity.class);
+                        startActivity(intent);
                     } else {
                         Toast.makeText(MainActivity.this, "Failed to add hike.", Toast.LENGTH_SHORT).show();
                     }
                 }
-                Intent intent = new Intent(MainActivity.this, HikeListActivity.class);
-                startActivity(intent);
+
             }
         });
         buttonViewAll.setOnClickListener(new View.OnClickListener() {
@@ -103,7 +103,10 @@ public class MainActivity extends AppCompatActivity {
         } else {
             tilLength.setError(null);
         }
-
+        if (parking.isEmpty()) {
+            // Handle difficulty validation if needed
+            isValid = false;
+        }
         if (difficulty.isEmpty()) {
             // Handle difficulty validation if needed
             isValid = false;

@@ -40,9 +40,6 @@ public class ObservationActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 saveObservation();
-                Intent intent = new Intent(ObservationActivity.this, ObservationListActivity.class);
-                intent.putExtra("hike_id", selectedHikeId);
-                startActivity(intent);
             }
         });
         buttonViewAll = findViewById((R.id.buttonViewAll));
@@ -96,9 +93,11 @@ public class ObservationActivity extends AppCompatActivity {
             long result = databaseHelper.insertObservation(selectedHikeId, observation, time, comments);
 
             if (result > 0) {
-
                 Toast.makeText(this, "Observation saved", Toast.LENGTH_SHORT).show();
                 clearInputFields();
+                Intent intent = new Intent(ObservationActivity.this, ObservationListActivity.class);
+                intent.putExtra("hike_id", selectedHikeId);
+                startActivity(intent);
             } else {
                 Toast.makeText(this, "Error saving observation", Toast.LENGTH_SHORT).show();
             }

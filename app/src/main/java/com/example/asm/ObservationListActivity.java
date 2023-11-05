@@ -18,6 +18,7 @@ public class ObservationListActivity extends AppCompatActivity {
     private ObservationAdapter observationAdapter;
     private DatabaseHelper databaseHelper;
     private SearchView searchView;
+    private Button buttonAdd, buttonBack;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,8 +48,9 @@ public class ObservationListActivity extends AppCompatActivity {
         observationAdapter = new ObservationAdapter(this, observationModels,  databaseHelper);
         recyclerView.setAdapter(observationAdapter);
 
-        Button fabCreateHike = findViewById(R.id.fabCreateHike);
-        fabCreateHike.setOnClickListener(new View.OnClickListener() {
+        buttonAdd = findViewById(R.id.fabCreateHike);
+        buttonBack = findViewById(R.id.buttonBack);
+        buttonAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(ObservationListActivity.this, ObservationActivity.class);
@@ -56,9 +58,13 @@ public class ObservationListActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-
-
-
+        buttonBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(ObservationListActivity.this, HikeListActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
 //    private void filterHikes(String query) {

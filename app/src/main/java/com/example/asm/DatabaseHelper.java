@@ -309,6 +309,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 }else {
                     observation.setTime("");
                 }
+                int hikeIdColumIndex = cursor.getColumnIndex((COLUMN_HIKE_ID));
+                if(hikeIdColumIndex != -1){
+                    observation.setHikeId(cursor.getInt(hikeIdColumIndex));
+                }else{
+                    observation.setHikeId(0);
+                }
                 int commentColumIndex = cursor.getColumnIndex(COLUMN_COMMENTS);
                 if(commentColumIndex != -1){
                     observation.setComments(cursor.getString(commentColumIndex));

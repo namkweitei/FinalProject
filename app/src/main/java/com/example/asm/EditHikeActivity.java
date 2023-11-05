@@ -10,16 +10,16 @@ import android.widget.Spinner;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
+
 
 public class EditHikeActivity extends AppCompatActivity {
     private HikeModel selectedHike;
     private DatabaseHelper databaseHelper;
-
-    private EditText editTextName;
-    private EditText editTextLocation;
-    private EditText editTextDate;
+    private TextInputLayout tilName, tilLocation, tilDate, tilLength;
+    private TextInputEditText editTextName, editTextLocation, editTextDate, editTextLength;
     private Spinner spinnerParking;
-    private EditText editTextLength;
     private Spinner spinnerDifficulty;
 
     @Override
@@ -38,7 +38,10 @@ public class EditHikeActivity extends AppCompatActivity {
         spinnerParking = findViewById(R.id.spinnerParking);
         editTextLength = findViewById(R.id.editTextLength);
         spinnerDifficulty = findViewById(R.id.spinnerDifficulty);
-
+        tilName = findViewById(R.id.tilName);
+        tilLocation = findViewById(R.id.tilLocation);
+        tilDate = findViewById(R.id.tilDate);
+        tilLength = findViewById(R.id.tilLength);
         editTextName.setText(selectedHike.getName());
         editTextLocation.setText(selectedHike.getLocation());
         editTextDate.setText(selectedHike.getDate());
@@ -63,12 +66,64 @@ public class EditHikeActivity extends AppCompatActivity {
             public void onClick(View view) {
                 saveChanges();
 
-                Intent intent = new Intent(EditHikeActivity.this, HikeListActivity.class);
-                startActivity(intent);
+
             }
         });
     }
+    private boolean validateInput(String name, String location, String date, String parking, String length, String difficulty) {
+        boolean isValid = true;
+        if (name.isEmpty()) {
+            tilName.setError("Name is required");
+            isValid = false;
+        } else {
+            tilName.setError(null);
+        }
 
+        if (location.isEmpty()) {
+            tilLocation.setError("Location is required");
+            isValid = false;
+        } else {
+            tilLocation.setError(null);
+        }
+
+        if (date.isEmpty()) {
+            tilDate.setError("Date is required");
+            isValid = false;
+        } else {
+            tilDate.setError(null);
+        }
+
+        if (length.isEmpty()) {
+            tilLength.setError("Length is required");
+            isValid = false;
+        } else {
+            tilLength.setError(null);
+        }
+        if (parking.isEmpty()) {
+            // Handle difficulty validation if needed
+            isValid = false;
+        }
+        if (difficulty.isEmpty()) {
+            // Handle difficulty validation if needed
+            isValid = false;
+        }
+
+        return isValid;
+    }
+    private void clearInputFields() {
+        editTextName.setText("");
+        editTextLocation.setText("");
+        editTextDate.setText("");
+        editTextLength.setText("");
+        spinnerParking.setSelection(0);
+        spinnerDifficulty.setSelection(0);
+
+        // Clear the error messages
+        tilName.setError(null);
+        tilLocation.setError(null);
+        tilDate.setError(null);
+        tilLength.setError(null);
+    }
     private void saveChanges() {
 
         String newName = editTextName.getText().toString();
@@ -77,21 +132,16 @@ public class EditHikeActivity extends AppCompatActivity {
         String newParking = spinnerParking.getSelectedItem().toString();
         String newLength = editTextLength.getText().toString();
         String newDifficulty = spinnerDifficulty.getSelectedItem().toString();
-        long result = databaseHelper.updateHike(
-                selectedHike.getId(),
-                newName,
-                newLocation,
-                newDate,
-                newParking,
-                newLength,
-                newDifficulty
-        );
-
-        if (result > 0) {
-            Toast.makeText(this, "Changes saved", Toast.LENGTH_SHORT).show();
-            finish();
-        } else {
-            Toast.makeText(this, "Error saving changes", Toast.LENGTH_SHORT).show();
+        if (validateInput(newName, newLocation, newDate, newParking, newLength, newDifficulty)) {
+            long result = databaseHelper.updateHike(selectedHike.getId(),newName, newLocation, newDate, newParking, newLength, newDifficulty);
+            if (result > 0) {
+                Toast.makeText(this, "Changes saved.", Toast.LENGTH_SHORT).show();
+                clearInputFields();
+                Intent intent = new Intent(this, HikeListActivity.class);
+                startActivity(intent);
+            } else {
+                Toast.makeText(this, "Error saving changes.", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 }
